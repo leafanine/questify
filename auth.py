@@ -1,6 +1,6 @@
 import streamlit as st
 import bcrypt
-from db import db
+import db
 
 def signup__ui():
     st.subheader("🔐 Signup")
