@@ -1,13 +1,20 @@
 import streamlit as st
 import bcrypt
-import db
+from firebase_config import db
 
-def signup__ui():
+def signup_ui():
     st.subheader("🔐 Signup")
     username = st.text_input("Username")
     password = st.text_input("Password", type="password")
 
     if st.button("Sign Up"):
+        if not username or not password:
+            st.error("Username and Password can not be empty!")
+            return
+        if len(password) < 6:
+            st.error("Password must be at least 6 characters long.")
+            return
+
         users = db.collection("users")
         existing = users.where("username", "==", username).stream()
 
@@ -34,6 +41,10 @@ def login_ui():
     password = st.text_input("Password", type="password")
 
     if st.button("Login"):
+        if not username or not password:
+            st.error("Username and Password can not be empty!")
+            return 
+        
         users = db.collection("users").where("username", "==", username).stream()
 
         user_doc = None
