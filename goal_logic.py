@@ -30,6 +30,22 @@ def delete_goal(goal_id):
 def dashboard_ui(user_id):
     st.subheader("🎯 Your Goals")
 
+    st.markdown("---")
+
+    #display xp
+    user_doc = db.collection("users").document(user_id).get()
+    if user_doc.exists:
+        user = user_doc.to_dict()
+        xp = user.get("total_xp", 0)
+        level = user.get("level", 1)
+        streak = user.get("streak", 0)
+
+        st.markdown(f"### 🧠 Level {level}  |  🏆 XP: {xp}  | 🔥 Streak: {streak} days")
+
+    else:
+        st.error("User not found")
+        return
+
     # --- Add new goal form ---
     with st.form("add_goal_form"):
         title = st.text_input("Goal Title")

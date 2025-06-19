@@ -1,3 +1,5 @@
 firebase_key.json
 questify/
 __pycache__/
+nginx/
+ngrok.exe
