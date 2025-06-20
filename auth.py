@@ -1,6 +1,7 @@
 import streamlit as st
 import bcrypt
 from firebase_config import db
+from datetime import datetime, timedelta
 
 def signup_ui():
     st.subheader("🔐 Signup")
@@ -61,5 +62,32 @@ def login_ui():
             st.session_state.logged_in = True
             st.session_state.user_id = user_doc.id
             st.success("Login successful.")
+
+            user_ref = db.collection("users").document(user_doc.id)
+
+            today = datetime.now().date()
+
+            last_login_str = user_data.get("last_login")
+            if last_login_str:
+                last_login = datetime.strptime(last_login_str, "%Y-%m-%d").date()
+                diff = (today - last_login).days
+
+                if diff == 1:
+                    new_streak = user_data.get("streak", 0) + 1
+
+                elif diff == 0:
+                    new_streak=user_data.get("streak", 0)
+
+                else:
+                    new_streak=1
+            
+            else:
+                new_streak=1
+
+            user_ref.update({
+                "streak": new_streak,
+                "last_login": today.strftime("%Y-%m-%d")
+            })
+        
         else:
             st.error("Incorrect password.")

@@ -20,7 +20,31 @@ def get_goals(user_id):
 
 # Toggle completion status
 def toggle_goal_status(goal_id, current_status):
-    db.collection("goals").document(goal_id).update({"completed": not current_status})
+    goal_ref = db.collection("goals").document(goal_id)
+    new_status = not current_status
+    goal_ref.update({"completed": new_status})
+
+    if new_status:
+        goal_doc = goal_ref.get()
+        if goal_doc.exists:
+            goal_data = goal_doc.to_dict()
+            user_id = goal_data.get("user_id")
+
+            if user_id:
+                user_ref = db.collection("users").document(user_id)
+                user_doc = user_ref.get()
+                if user_doc.exists:
+                    user_data = user_doc.to_dict()
+                    new_xp = user_data.get("total_xp", 0) + 10
+                    new_level = new_xp // 100 + 1
+
+                    user_ref.update({
+                        "total_xp": new_xp,
+                        "level": new_level
+                    })
+
+
+
 
 # Delete a goal
 def delete_goal(goal_id):
